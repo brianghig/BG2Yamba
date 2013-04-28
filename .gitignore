@@ -1,2 +1,7 @@
+# generated files
+bin/
+gen/
+
+# java class files
 *.class
-gen/*
+
