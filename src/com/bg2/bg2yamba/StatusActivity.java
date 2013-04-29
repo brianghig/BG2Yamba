@@ -50,7 +50,7 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		 * Initialize the value of Character Length Text to the max length,
 		 * assuming that we start with a blank input form
 		 */
-		characterLengthText.setText(MAX_LENGTH);
+		characterLengthText.setText( String.valueOf(MAX_LENGTH) );
 		
 		updateButton.setOnClickListener(this);
 		
@@ -131,7 +131,7 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		Log.d(TAG, "Got remaining character length of: " + remaining);
 		
 		// Update the remaining count
-		characterLengthText.setText(remaining);
+		characterLengthText.setText( String.valueOf(remaining) );
 		
 		// Update the color to reflect a warning based on the remaining characters
 		characterLengthText.setTextColor( 
