@@ -6,5 +6,6 @@
     <string name="statusTitle">Update your status</string>
     <string name="statusHint">Enter your cool, new status!</string>
     <string name="statusUpdateButton">Post</string>
-
+	<string name="statusUpdateFailed">Status update failed</string>
+    
 </resources>
