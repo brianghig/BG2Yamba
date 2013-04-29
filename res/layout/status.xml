@@ -21,7 +21,17 @@
         android:gravity="left"
         android:hint="@string/statusHint"
         android:id="@+id/statusEditText" />
-        
+       
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textSize="20sp"
+        android:layout_margin="10dp"
+        android:text="@string/statusMaxCharacterLength"
+        android:id="@+id/statusCharacterLength"
+        android:background="#cfff" />
+    
     <Button 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -7,5 +7,6 @@
     <string name="statusHint">Enter your cool, new status!</string>
     <string name="statusUpdateButton">Post</string>
 	<string name="statusUpdateFailed">Status update failed</string>
+	<string name="statusMaxCharacterLength">140</string>
     
 </resources>
