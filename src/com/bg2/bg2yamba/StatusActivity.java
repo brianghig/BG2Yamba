@@ -20,7 +20,7 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 	
 	private static final String TAG = StatusActivity.class.getSimpleName();
 	
-	private int MAX_LENGTH = Integer.valueOf( getString(R.string.statusMaxCharacterLength) );
+	private int MAX_LENGTH;
 	
 	private static final int YELLOW_THRESHOLD = 20;
 	private static final int RED_THRESHOLD = 10;
@@ -43,6 +43,8 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		editText = (EditText) findViewById(R.id.statusEditText);
 		characterLengthText = (TextView) findViewById(R.id.statusCharacterLength);
 		updateButton = (Button) findViewById(R.id.statusButton);
+		
+		MAX_LENGTH = Integer.valueOf( getString(R.string.statusMaxCharacterLength) );
 		
 		/*
 		 * Initialize the value of Character Length Text to the max length,
