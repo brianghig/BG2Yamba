@@ -1,14 +1,32 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
     tools:context=".StatusActivity" >
-
+    
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_world" />
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:text="@string/hello_world"
+        android:id="@+id/statusTitle" />
+    
+    <EditText
+        android:layout_weight="1"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:gravity="left"
+        android:hint="@string/statusHint"
+        android:id="@+id/statusEditText" />
+        
+    <Button 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/updateButtonText"
+        android:textSize="25sp"
+        android:id="@+id/statusButton"/>
 
-</RelativeLayout>
+</LinearLayout>

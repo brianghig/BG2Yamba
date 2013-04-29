@@ -3,6 +3,8 @@
 
     <string name="app_name">BG2Yamba</string>
     <string name="menu_settings">Settings</string>
-    <string name="hello_world">Hello Martians!</string>
+    <string name="hello_world">Update your status</string>
+    <string name="statusHint">Enter your cool, new status!</string>
+    <string name="updateButtonText">Post</string>
 
 </resources>

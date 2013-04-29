@@ -1,6 +1,7 @@
 # generated files
 bin/
 gen/
+.settings/
 
 # java class files
 *.class
