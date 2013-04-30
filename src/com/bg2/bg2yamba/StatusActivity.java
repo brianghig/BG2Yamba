@@ -69,15 +69,20 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		
 		text = editText.getText().toString();
 		
-		if(text.length() > 0) {
-			
+		if (text.length() > MAX_LENGTH) {
+			Log.d(TAG, text.length() + " character status, don't bother posting to server!");
+			Toast.makeText(StatusActivity.this, R.string.warningExceedCharacterLimit, Toast.LENGTH_LONG).show();
+		}
+		
+		else if(text.length() <= 0){
+			Log.d(TAG, "0 character status, don't bother posting to server!");
+			Toast.makeText(StatusActivity.this, R.string.warningZeroCharacter, Toast.LENGTH_LONG).show();
+		}
+		else {
 			Log.d(TAG, "Attempting updating status with " + text);
 			new PostToTwitter().execute(text);
 		}
-		else {
-			Log.d(TAG, "0 character status, don't bother posting to server!");
-			Toast.makeText(StatusActivity.this, "Please enter text", Toast.LENGTH_LONG).show();
-		}
+		
 			
 			
 	}
