@@ -69,9 +69,16 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		
 		text = editText.getText().toString();
 		
-		Log.d(TAG, "Attempting updating status with " + text);
-		
-		new PostToTwitter().execute(text);
+		if(text.length() > 0) {
+			
+			Log.d(TAG, "Attempting updating status with " + text);
+			new PostToTwitter().execute(text);
+		}
+		else {
+			Log.d(TAG, "0 character status, don't bother posting to server!");
+			Toast.makeText(StatusActivity.this, "Please enter text", Toast.LENGTH_LONG).show();
+		}
+			
 			
 	}
 	
@@ -98,7 +105,14 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		
 		@Override
 		protected void onPostExecute(String result) {
-			Toast.makeText(StatusActivity.this, result, Toast.LENGTH_LONG).show();
+			if(result.equals("Status update failed")){
+				Log.d(TAG, "Async update status failed");
+				Toast.makeText(StatusActivity.this, result, Toast.LENGTH_LONG).show();
+			}
+			else {
+				Log.d(TAG, "Async update status successful");
+				Toast.makeText(StatusActivity.this, "Status update successful", Toast.LENGTH_LONG).show();
+			}
 			
 			Log.d(TAG, "Async update status finished");
 		}
