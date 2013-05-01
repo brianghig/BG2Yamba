@@ -11,4 +11,13 @@
 	<string name="warningZeroCharacter">Please enter text</string>
 	<string name="warningExceedCharacterLimit">Status too long</string>
     
+	<string name="summaryUsername">The account username for the Twitter API</string>
+    <string name="titleUsername">Username</string>
+    <string name="summaryPassword">The account password for the Twitter API</string>
+    <string name="titlePassword">Password</string>
+    <string name="summaryApiRoot">URL for the Twitter API</string>
+    <string name="titleApiRoot">API Root</string>
+    
+    <string name="titlePrefs">Preferences</string>
+	
 </resources>

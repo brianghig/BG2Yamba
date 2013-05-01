@@ -3,12 +3,19 @@ package com.bg2.bg2yamba;
 import winterwell.jtwitter.Twitter;
 import winterwell.jtwitter.TwitterException;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -16,7 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class StatusActivity extends Activity implements OnClickListener, TextWatcher {
+public class StatusActivity extends Activity implements OnClickListener, TextWatcher, OnSharedPreferenceChangeListener {
 	
 	private static final String TAG = StatusActivity.class.getSimpleName();
 	
@@ -25,6 +32,8 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 	private static final int YELLOW_THRESHOLD = 20;
 	private static final int RED_THRESHOLD = 10;
 	private static final int MAGENTA_THRESHOLD = 0;
+	
+	protected SharedPreferences sharedPreferences;
 	
 	protected EditText editText;
 	protected TextView characterLengthText;
@@ -39,6 +48,10 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.status);
+		
+		//Setup preferences
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		
 		editText = (EditText) findViewById(R.id.statusEditText);
 		characterLengthText = (TextView) findViewById(R.id.statusCharacterLength);
@@ -56,13 +69,29 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		
 		editText.addTextChangedListener(this);
 		
-		twitter = new Twitter("gazattack", "Pa$$w0rd");
-		twitter.setAPIRootUrl("http://yamba.marakana.com/api");
-		
 		Log.d(TAG, "StatusActivity finished onCreate");
 		
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = this.getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		switch( item.getItemId() ) {
+			case R.id.itemPrefs:
+				startActivity(new Intent(this, PrefsActivity.class));
+				break;
+		}
+		
+		return true;
+	}
+	
 	@Override
 	public void onClick(View arg0) {
 		String text;
@@ -95,7 +124,7 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 				
 				Log.d(TAG, "Async update status with " + statuses[0]);
 				
-				winterwell.jtwitter.Status status = twitter.updateStatus(statuses[0]);
+				winterwell.jtwitter.Status status = getTwitter().updateStatus(statuses[0]);
 				
 				return status.text;
 			}
@@ -191,6 +220,41 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		Log.d(TAG, "Returning color: " + color);
 		
 		return color;
+		
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+		
+		/*
+		 * invalidate the Twitter object so that a new one will
+		 * be created the next time that it is required
+		 */
+		twitter = null;
+		
+	}
+	
+	/**
+	 * Retrieves an instance of the Twitter class,
+	 * either from the existing field, or a new instance
+	 * created from the user's preferences
+	 * 
+	 * @return an instance of the Twitter API
+	 */
+	private Twitter getTwitter() {
+		
+		if(twitter == null) {
+			String username, password, apiRoot;
+			username = sharedPreferences.getString("username", "");
+			password = sharedPreferences.getString("password", "");
+			apiRoot = sharedPreferences.getString("apiRoot", "http://yamba.marakana.com/api");
+			
+			//Connect to Twitter with the latest information
+			twitter = new Twitter(username, password);
+			twitter.setAPIRootUrl(apiRoot);
+		}
+		
+		return twitter;
 		
 	}
 
