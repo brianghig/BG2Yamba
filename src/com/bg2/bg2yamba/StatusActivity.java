@@ -72,7 +72,31 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		Log.d(TAG, "StatusActivity finished onCreate");
 		
 	}
-
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		Log.d(TAG, "StatusActivity beginning onResume");
+		
+		String username = sharedPreferences.getString("username", null);
+		
+		if(username == null) {
+			Log.d(TAG, "Please set a username");
+			
+			finish();
+			//Intent to preferences screen or another activity
+			Toast.makeText(StatusActivity.this, "No preferences!", Toast.LENGTH_LONG).show();
+			Intent intent = new Intent(this, PrefsActivity.class);
+			startActivity(intent);
+		}
+		else {
+			Log.d(TAG, "Username = " + username);
+		}
+		
+		Log.d(TAG, "StatusActivity finished onResume");
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = this.getMenuInflater();
