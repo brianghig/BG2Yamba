@@ -20,6 +20,7 @@ public class WelcomeActivity extends Activity implements OnClickListener, OnShar
 	
 	protected EditText username;
 	protected EditText password;
+	protected EditText apiRoot;
 	protected Button startButton;
 	
 	protected SharedPreferences sharedPreferences;
@@ -39,6 +40,7 @@ public class WelcomeActivity extends Activity implements OnClickListener, OnShar
 		
 		username = (EditText) findViewById(R.id.usernameText);
 		password = (EditText) findViewById(R.id.passwordText);
+		apiRoot = (EditText) findViewById(R.id.apiRootText);
 		startButton = (Button) findViewById(R.id.welcomeButton);
 		
 		startButton.setOnClickListener(this);
@@ -53,29 +55,71 @@ public class WelcomeActivity extends Activity implements OnClickListener, OnShar
 	@Override
 	protected void onResume() {
 		super.onResume();
-	
-		String username = sharedPreferences.getString("username", null);
-		String password = sharedPreferences.getString("password", null);
 		
-		if(username == null || password == null) {
-			Log.d(TAG, "Username or password blank, stay here and wait");
+		Object[][] preferenceIdToFieldMatches = new Object[][]{
+				{ R.string.preferenceKeyUsername, username },
+				{ R.string.preferenceKeyPassword, password },
+				{ R.string.preferenceKeyApiRoot, apiRoot }
+			};
+		
+		boolean hasEmptyPreference = false;
+		preferenceValidationLoop: for(int i=0; i < preferenceIdToFieldMatches.length; i++) {
+			Object[] preferenceIdToFieldMatch = preferenceIdToFieldMatches[i];
+			int preferenceKeyId = (Integer)preferenceIdToFieldMatch[0];
 			
-			Toast.makeText(WelcomeActivity.this, "No preferences!", Toast.LENGTH_LONG).show();
+			if( this.isBlankPreference(preferenceKeyId) ) {
+				Log.d(TAG, "Found blank preference value, so setting hasEmptyPreference to true");
+				hasEmptyPreference = true;
+				break preferenceValidationLoop;
+			}
+		}
+		
+		if( hasEmptyPreference ) {
+			Log.d(TAG, "Some preference value is blank, so staying with WelcomeActivity");
+			
+			/*
+			 * Sets the value of input preferences fields to match the
+			 * currently saved Shared Preferences
+			 */
+			updateEditTextWithPreferenceValue(preferenceIdToFieldMatches);
+			
+			Toast.makeText(WelcomeActivity.this, "Enter login information", Toast.LENGTH_LONG).show();
+						
 		}
 		else {
-			Log.d(TAG, "Username exists, go to StatusActivity!");
+			Log.d(TAG, "All required preferences are set, so move to Status Activity");
 			
-			finish();
+			finish(); //TODO Should this be done before or after starting the StatusActivity?
 			
 			//Intent over to StatusActivity
 			Intent intent = new Intent(this, StatusActivity.class);
 			startActivity(intent);
 		}
 		
-		Log.d(TAG, "WelcomeActivity finished onResume");
+		Log.d(TAG, "Finished onResume");
 		
 	}
 	
+	/**
+	 * Based on a mapping of Shared Preference Key ID - to - EditText field,
+	 * set the EditText to any saved preference value
+	 * 
+	 * @param preferenceIdToFieldMatches
+	 */
+	protected void updateEditTextWithPreferenceValue(Object[][] preferenceIdToFieldMatches) {
+		
+		for(int i=0; i < preferenceIdToFieldMatches.length; i++) {
+			Object[] idToFieldMatch = preferenceIdToFieldMatches[i];
+			int preferenceKeyId = (Integer)idToFieldMatch[0];
+			EditText editTextField = (EditText)idToFieldMatch[1];
+			
+			String preferenceKey = getString(preferenceKeyId);
+			String value = sharedPreferences.getString(preferenceKey, null);
+			editTextField.setText(value);
+		}
+		
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -92,22 +136,38 @@ public class WelcomeActivity extends Activity implements OnClickListener, OnShar
 	 */
 	@Override
 	public void onClick(View arg0) {
-		String usernameField, passwordField;
+		String usernameField, passwordField, apiRootValue;
 		SharedPreferences.Editor editor;
 		Boolean result;
 		
 		usernameField = username.getText().toString();
 		passwordField = password.getText().toString();
+		apiRootValue = apiRoot.getText().toString();
 		
-		if(usernameField.equals("") || passwordField.equals("")) {
-			Log.d(TAG, "Username or password blank, stay here and wait");
+		String[] values = new String[]{ usernameField, passwordField, apiRootValue };
+		
+		boolean allValid = true;
+		for(int i=0; i < values.length; i++) {
+			String val = values[i];
+			Log.d(TAG, "Checking value of input: [" + val + "]");
+			if( this.isBlankString(val) ) {
+				allValid = false;
+				break;
+			}
+		}
+		
+		if( !allValid ) {
+			
+			Log.d(TAG, "Some required shared preference input is blank, stay here and wait");
 		}
 		else {
 			Log.d(TAG, "Adding entries to preferences");
 			editor = sharedPreferences.edit();
 			
-			editor.putString("username", usernameField);
-			editor.putString("password", passwordField);
+			editor.putString( getString(R.string.preferenceKeyUsername), usernameField);
+			editor.putString( getString(R.string.preferenceKeyPassword), passwordField);
+			editor.putString( getString(R.string.preferenceKeyApiRoot), apiRootValue);
+			
 			result = editor.commit();
 			
 			finish();
@@ -125,6 +185,59 @@ public class WelcomeActivity extends Activity implements OnClickListener, OnShar
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	/**
+	 * Retrieves and checks the blankness of the value of a Shared Preference
+	 * by the preference key. Returns true if blank, false otherwise.
+	 * 
+	 * @param preferenceKeyResourceId R.string ID of the key value of the Shared Preference
+	 * @return
+	 */
+	protected boolean isBlankPreference(int preferenceKeyResourceId) {
+		
+		String preferenceKey = this.getString(preferenceKeyResourceId);
+		Log.d(TAG, "Retrieved preference key: [" + preferenceKey + "]");
+		
+		String value = sharedPreferences.getString(preferenceKey, null);
+		Log.d(TAG, "Retrieved preferenceKey: [" + preferenceKey + "] value of: [" + value + "]");
+		
+		boolean isEmpty = isBlankString(value);
+		Log.d(TAG, "Returning " + isEmpty + " for blank check of preference: [" + preferenceKey + "]");
+		
+		return isEmpty;
+		
+	}
+
+	/**
+	 * Retrieves and checks the blankness of the value of a String.
+	 * Returns true if blank, false otherwise.
+	 * 
+	 * Note: this could also be achieved with Apache Commons Lang StringUtils,
+	 * but we're doing it here to avoid including that entire third party lib.
+	 * 
+	 * @param value
+	 * @return
+	 */
+	protected boolean isBlankString(String value) {
+		
+		// default to invalid until we verify that all criteria pass
+		boolean isEmpty = true;
+		
+		// Validate that the string is not null
+		if( value != null ) {
+			
+			/*
+			 * Validate that we have some non-blank value in
+			 * the saved preference (eliminate empty, whitespace strings) 
+			 */
+			value = value.trim();
+			if( !"".equals(value) ) {
+				isEmpty = false;
+			}
+		}
+		
+		return isEmpty;
 	}
 
 }

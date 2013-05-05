@@ -29,6 +29,13 @@
         android:hint="@string/titlePassword"
         android:id="@+id/passwordText" />
     
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:hint="@string/titleApiRoot"
+        android:id="@+id/apiRootText" />
+    
     <Button 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
