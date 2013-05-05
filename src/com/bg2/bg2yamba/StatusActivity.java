@@ -74,30 +74,6 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 	}
 	
 	@Override
-	protected void onResume() {
-		super.onResume();
-		
-		Log.d(TAG, "StatusActivity beginning onResume");
-		
-		String username = sharedPreferences.getString("username", null);
-		
-		if(username == null) {
-			Log.d(TAG, "Please set a username");
-			
-			finish();
-			//Intent to preferences screen or another activity
-			Toast.makeText(StatusActivity.this, "No preferences!", Toast.LENGTH_LONG).show();
-			Intent intent = new Intent(this, PrefsActivity.class);
-			startActivity(intent);
-		}
-		else {
-			Log.d(TAG, "Username = " + username);
-		}
-		
-		Log.d(TAG, "StatusActivity finished onResume");
-	}
-	
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = this.getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
@@ -179,13 +155,11 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 
 	@Override
 	public void afterTextChanged(Editable s) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -272,6 +246,8 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 			username = sharedPreferences.getString("username", "");
 			password = sharedPreferences.getString("password", "");
 			apiRoot = sharedPreferences.getString("apiRoot", "http://yamba.marakana.com/api");
+			
+			Log.d(TAG, "Username: " + username + ", Password: " + password + ", API URL: " + apiRoot);
 			
 			//Connect to Twitter with the latest information
 			twitter = new Twitter(username, password);
