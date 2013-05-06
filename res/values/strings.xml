@@ -26,5 +26,9 @@
     <string name="preferenceKeyUsername">username</string>
     <string name="preferenceKeyPassword">password</string>
     <string name="preferenceKeyApiRoot">apiRoot</string>
+    
+    <!-- Service Start and Stop Menu Options -->
+    <string name="titleServiceStart">Start Update Service</string>
+    <string name="titleServiceStop">Stop Update Service</string>
 
 </resources>
