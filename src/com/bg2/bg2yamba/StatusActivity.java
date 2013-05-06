@@ -1,15 +1,11 @@
 package com.bg2.bg2yamba;
 
-import winterwell.jtwitter.Twitter;
 import winterwell.jtwitter.TwitterException;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,7 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class StatusActivity extends Activity implements OnClickListener, TextWatcher, OnSharedPreferenceChangeListener {
+public class StatusActivity extends Activity implements OnClickListener, TextWatcher {
 	
 	private static final String TAG = StatusActivity.class.getSimpleName();
 	
@@ -33,25 +29,14 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 	private static final int RED_THRESHOLD = 10;
 	private static final int MAGENTA_THRESHOLD = 0;
 	
-	protected SharedPreferences sharedPreferences;
-	
 	protected EditText editText;
 	protected TextView characterLengthText;
 	protected Button updateButton;
-	
-	/**
-	 * Twitter client for Learning Android Marakana API
-	 */
-	protected Twitter twitter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.status);
-		
-		//Setup preferences
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		
 		editText = (EditText) findViewById(R.id.statusEditText);
 		characterLengthText = (TextView) findViewById(R.id.statusCharacterLength);
@@ -124,7 +109,8 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 				
 				Log.d(TAG, "Async update status with " + statuses[0]);
 				
-				winterwell.jtwitter.Status status = getTwitter().updateStatus(statuses[0]);
+				YambaApplication yamba = (YambaApplication) getApplication();
+				winterwell.jtwitter.Status status = yamba.getTwitter().updateStatus(statuses[0]);
 				
 				return status.text;
 			}
@@ -220,42 +206,5 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		return color;
 		
 	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-		
-		/*
-		 * invalidate the Twitter object so that a new one will
-		 * be created the next time that it is required
-		 */
-		twitter = null;
-		
-	}
 	
-	/**
-	 * Retrieves an instance of the Twitter class,
-	 * either from the existing field, or a new instance
-	 * created from the user's preferences
-	 * 
-	 * @return an instance of the Twitter API
-	 */
-	private Twitter getTwitter() {
-		
-		if(twitter == null) {
-			String username, password, apiRoot;
-			username = sharedPreferences.getString("username", "");
-			password = sharedPreferences.getString("password", "");
-			apiRoot = sharedPreferences.getString("apiRoot", "http://yamba.marakana.com/api");
-			
-			Log.d(TAG, "Username: " + username + ", Password: " + password + ", API URL: " + apiRoot);
-			
-			//Connect to Twitter with the latest information
-			twitter = new Twitter(username, password);
-			twitter.setAPIRootUrl(apiRoot);
-		}
-		
-		return twitter;
-		
-	}
-
 }
