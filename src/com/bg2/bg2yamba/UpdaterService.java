@@ -1,5 +1,9 @@
 package com.bg2.bg2yamba;
 
+import java.util.List;
+
+import winterwell.jtwitter.Twitter.Status;
+import winterwell.jtwitter.TwitterException;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -21,7 +25,7 @@ public class UpdaterService extends Service {
 	 * Millisecond delay indicating how often the Updater
 	 * thread should check the Twitter API for status updates
 	 */
-	private static final int DELAY = 3000; // 60K ms = 60s = 1 minute
+	private static final int DELAY = 60000; // 60K ms = 60s = 1 minute
 	
 	/**
 	 * boolean indicator of whether or not the
@@ -35,6 +39,12 @@ public class UpdaterService extends Service {
 	 */
 	private Updater updater;
 	
+	/**
+	 * Handle on the application context that will receive updates
+	 * for the running status of the UpdaterService 
+	 */
+	private YambaApplication yamba;
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		// We are not using a bound service, so OK to return null
@@ -46,6 +56,7 @@ public class UpdaterService extends Service {
 		super.onCreate();
 		
 		this.updater = new Updater();
+		this.yamba = (YambaApplication) this.getApplication();
 		
 		Log.d(TAG, "onCreated");
 	}
@@ -56,6 +67,7 @@ public class UpdaterService extends Service {
 		
 		this.runFlag = true;
 		this.updater.start();
+		this.updateServiceStatus();
 		
 		Log.d(TAG, "onStarted");
 		return START_STICKY;
@@ -72,8 +84,17 @@ public class UpdaterService extends Service {
 		this.runFlag = false;
 		this.updater.interrupt();
 		this.updater = null;
+		this.updateServiceStatus();
 		
 		Log.d(TAG, "onDestroyed");
+	}
+	
+	/**
+	 * Updates the running status of the service
+	 * with the application context
+	 */
+	private void updateServiceStatus() {
+		this.yamba.setServiceRunning(runFlag);
 	}
 	
 	/**
@@ -84,6 +105,8 @@ public class UpdaterService extends Service {
 	 *
 	 */
 	private class Updater extends Thread {
+		
+		List<Status> timeline;
 		
 		public Updater() {
 			// Thread Name to help identify in debugging
@@ -98,7 +121,20 @@ public class UpdaterService extends Service {
 				Log.d(TAG, "Updater running");
 				try {
 					
-					//TODO Work goes here...
+					try {
+						timeline = yamba.getTwitter().getHomeTimeline();
+					} catch( TwitterException e ) {
+						Log.e(TAG, "Failed to connect to Twitter service", e);
+					}
+					
+					/*
+					 * Print the results for now
+					 */
+					if( timeline != null ) {
+						for( Status status : timeline ) {
+							Log.d(TAG, String.format("%s: %s", status.user.name, status.text));
+						}
+					}
 					
 					Log.d(TAG, "Updater ran");
 					

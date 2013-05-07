@@ -21,6 +21,12 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 	 */
 	private SharedPreferences prefs;
 	
+	/**
+	 * Indicator for whether or not the updater service is running
+	 * and retrieving status updates from the Twitter API
+	 */
+	private boolean serviceRunning;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -71,6 +77,14 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 		
 		return this.twitter;
 		
+	}
+
+	public boolean isServiceRunning() {
+		return serviceRunning;
+	}
+
+	public void setServiceRunning(boolean serviceRunning) {
+		this.serviceRunning = serviceRunning;
 	}
 
 }

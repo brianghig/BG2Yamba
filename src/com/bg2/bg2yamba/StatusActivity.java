@@ -116,7 +116,7 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 				Log.d(TAG, "Async update status with " + statuses[0]);
 				
 				YambaApplication yamba = (YambaApplication) getApplication();
-				winterwell.jtwitter.Status status = yamba.getTwitter().updateStatus(statuses[0]);
+				winterwell.jtwitter.Twitter.Status status = yamba.getTwitter().updateStatus(statuses[0]);
 				
 				return status.text;
 			}
