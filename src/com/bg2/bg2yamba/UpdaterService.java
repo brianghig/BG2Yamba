@@ -7,6 +7,7 @@ import winterwell.jtwitter.TwitterException;
 import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.util.Log;
@@ -174,7 +175,12 @@ public class UpdaterService extends Service {
 							 * Perform the DB insert as a prepared statement with the
 							 * ContentValues object to avoid sql injection.
 							 */
-							db.insertOrThrow(DBHelper.TABLE_TIMELINE, null, values);
+							try {
+								db.insertOrThrow(DBHelper.TABLE_TIMELINE, null, values);
+							} catch(SQLException e) {
+								// ignore, but log error that likely came from duplicate ID constraint
+								Log.e(TAG, "Catching and ignoring SQL exception while inserting retrieved status update", e);
+							}
 							
 						}
 						
