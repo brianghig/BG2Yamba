@@ -179,7 +179,7 @@ public class UpdaterService extends Service {
 								db.insertOrThrow(DBHelper.TABLE_TIMELINE, null, values);
 							} catch(SQLException e) {
 								// ignore, but log error that likely came from duplicate ID constraint
-								Log.e(TAG, "Catching and ignoring SQL exception while inserting retrieved status update", e);
+								Log.e(TAG, "Catching and ignoring SQL exception while inserting retrieved status update: " + e.getMessage());
 							}
 							
 						}
