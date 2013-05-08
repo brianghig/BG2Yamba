@@ -1,7 +1,11 @@
 package com.bg2.bg2yamba;
 
+import java.util.List;
+
 import winterwell.jtwitter.Twitter;
+import winterwell.jtwitter.Twitter.Status;
 import android.app.Application;
+import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
@@ -27,11 +31,17 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 	 */
 	private boolean serviceRunning;
 	
+	/**
+	 * Common data accessor for Status Data
+	 */
+	private StatusData statusData;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		this.prefs.registerOnSharedPreferenceChangeListener(this);
+		this.statusData = new StatusData(this);
 		Log.i(TAG, "onCreated");
 	}
 	
@@ -85,6 +95,58 @@ public class YambaApplication extends Application implements OnSharedPreferenceC
 
 	public void setServiceRunning(boolean serviceRunning) {
 		this.serviceRunning = serviceRunning;
+	}
+	
+	public StatusData getStatusData() {
+		return this.statusData;
+	}
+	
+	/**
+	 * Returns the count of new statuses, and persists those new statuses into the DB
+	 * @return
+	 */
+	public synchronized int fetchStatusUpdates() {
+		
+		Log.d(TAG, "Fetching status updates");
+		
+		Twitter twitter = this.getTwitter();
+		
+		if( twitter == null ) {
+			Log.d(TAG, "Twitter connection cannot be initialized");
+			return 0;
+		}
+		
+		try {
+			List<Status> statusUpdates = twitter.getHomeTimeline();
+			
+			long latestStatusCreatedAtTime = this.getStatusData().getLatestStatusCreatedAtTime();
+			int count = 0;
+			
+			ContentValues values = new ContentValues();
+			for(Status status : statusUpdates) {
+				values.clear();
+				values.put(StatusData.C_ID, status.getId());
+				long createdAt = status.getCreatedAt().getTime();
+				values.put(StatusData.C_CREATED_AT, createdAt);
+				values.put(StatusData.C_TEXT, status.getText());
+				values.put(StatusData.C_SOURCE, status.source);
+				values.put(StatusData.C_USER, status.getUser().getName());
+				Log.d(TAG, "Got update with ID " + status.getId() + ". Saving");
+				this.getStatusData().insertOrIgnore(values);
+				if( latestStatusCreatedAtTime < createdAt ) {
+					count++;
+				}
+			}
+			
+			Log.d(TAG, count > 0 ? "Got " + count + " status updates" : "No new status updates");
+			
+			return count;
+			
+		} catch( RuntimeException e ) {
+			Log.e(TAG, "Failed to fetch status updates", e);
+			return 0;
+		}
+		
 	}
 
 }

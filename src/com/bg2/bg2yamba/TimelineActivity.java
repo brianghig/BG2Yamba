@@ -1,7 +1,6 @@
 package com.bg2.bg2yamba;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
@@ -17,17 +16,15 @@ public class TimelineActivity extends BaseActivity {
 
 	protected ListView listTimeline;
 	
-	protected DBHelper dbHelper;
-	protected SQLiteDatabase db;
 	protected Cursor cursor;
 	protected SimpleCursorAdapter adapter;
 	
 	/**
-	 * String array specifying which columsn in the cursor we're
-	 * binding from
+	 * Array of Strings representing the columns in the Cursor
+	 * that we will bind to the list view elements
 	 */
 	protected static final String[] FROM = {
-		DBHelper.C_CREATED_AT, DBHelper.C_USER, DBHelper.C_TEXT
+		StatusData.C_CREATED_AT, StatusData.C_USER, StatusData.C_TEXT
 	};
 	
 	/**
@@ -48,11 +45,8 @@ public class TimelineActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.timeline);
 		
+		// Find the Timeline List View
 		this.listTimeline = (ListView) this.findViewById(R.id.listTimeline);
-		
-		// Connect to the database
-		dbHelper = new DBHelper(this);
-		db = dbHelper.getReadableDatabase();
 		
 	}
 	
@@ -62,7 +56,10 @@ public class TimelineActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		db.close();
+		
+		// Close the database
+		yamba.getStatusData().close();
+		
 	}
 	
 	/**
@@ -73,22 +70,25 @@ public class TimelineActivity extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		
-		cursor = db.query(DBHelper.TABLE_TIMELINE, null, null, null, null, null, DBHelper.C_CREATED_AT + " DESC");
+		// Setup the list
+		this.setupList();
+		
+	}
+	
+	/**
+	 * Retrieves a cursor for the currently cached Status Updates,
+	 * and binds the List Timeline with an associated Simple Cursor Adapter
+	 * that is bound to a custom ViewBinder for some data manipulation
+	 */
+	protected void setupList() {
+		// Get the data
+		cursor = yamba.getStatusData().getStatusUpdates();
 		startManagingCursor(cursor);
 		
-		// Set up the Adapter that will feed data into our List Timeline
-		this.adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO, SimpleCursorAdapter.NO_SELECTION);
-		
-		/*
-		 * Instead of subclassing and creating an entirely new Cursor Adapter,
-		 * we can simply create a view binder that is [supposedly] more efficient.
-		 * Not sure how it is more efficient though... apparently the call to
-		 * bindView is heavy??
-		 */
-		adapter.setViewBinder( VIEW_BINDER );
-		
-		listTimeline.setAdapter(this.adapter);
-		
+		// Setup adapter
+		adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
+		adapter.setViewBinder(VIEW_BINDER);
+		listTimeline.setAdapter(adapter);
 	}
 	
 	/**

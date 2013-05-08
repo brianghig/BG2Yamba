@@ -1,14 +1,7 @@
 package com.bg2.bg2yamba;
 
-import java.util.List;
-
-import winterwell.jtwitter.Twitter.Status;
-import winterwell.jtwitter.TwitterException;
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -48,11 +41,6 @@ public class UpdaterService extends Service {
 	 */
 	private YambaApplication yamba;
 	
-	/**
-	 * DBHelper to provide CRUD methods to the database
-	 */
-	private DBHelper dbHelper;
-	
 	@Override
 	public IBinder onBind(Intent intent) {
 		// We are not using a bound service, so OK to return null
@@ -65,9 +53,6 @@ public class UpdaterService extends Service {
 		
 		this.updater = new Updater();
 		this.yamba = (YambaApplication) this.getApplication();
-		
-		// Use this as the Context since UpdaterService is a Service is a Context
-		this.dbHelper = new DBHelper(this);
 		
 		Log.d(TAG, "onCreated");
 	}
@@ -117,8 +102,6 @@ public class UpdaterService extends Service {
 	 */
 	private class Updater extends Thread {
 		
-		List<Status> timeline;
-		
 		public Updater() {
 			// Thread Name to help identify in debugging
 			super("UpdaterService-Updater");
@@ -132,67 +115,13 @@ public class UpdaterService extends Service {
 				
 				try {
 					
-					Log.d(TAG, "Updater running");
+					Log.d(TAG, "Running background status retrieval thread");
 					
-					/*
-					 * Clear the timeline so we don't attempt to enter
-					 * duplicate data in the case of a TwitterException
-					 */
-					timeline = null;
-					
-					try {
-						timeline = yamba.getTwitter().getHomeTimeline();
-					} catch( TwitterException e ) {
-						Log.e(TAG, "Failed to connect to Twitter service", e);
+					YambaApplication yamba = (YambaApplication) updaterService.getApplication();
+					int newUpdates = yamba.fetchStatusUpdates();
+					if( newUpdates > 0 ) {
+						Log.d(TAG, "We have a new status");
 					}
-					
-					/*
-					 * Print the results for now
-					 */
-					if( timeline != null ) {
-						
-						// Get a handle on the writable database
-						SQLiteDatabase db = dbHelper.getWritableDatabase();
-						
-						/*
-						 * simple name-value pair that maps database
-						 * table names to their respective values
-						 */
-						ContentValues values = new ContentValues();
-						
-						for( Status status : timeline ) {
-							
-							Log.d(TAG, String.format("%s: %s", status.user.name, status.text));
-							
-							values.clear(); // make sure we're starting with a fresh value object
-							values.put(DBHelper.C_ID, status.id);
-							values.put(DBHelper.C_CREATED_AT, status.createdAt.getTime());
-							values.put(DBHelper.C_SOURCE, status.source);
-							values.put(DBHelper.C_TEXT, status.text);
-							values.put(DBHelper.C_USER, status.user.name);
-							
-							/*
-							 * Perform the DB insert as a prepared statement with the
-							 * ContentValues object to avoid sql injection.
-							 */
-							try {
-								db.insertOrThrow(DBHelper.TABLE_TIMELINE, null, values);
-							} catch(SQLException e) {
-								// ignore, but log error that likely came from duplicate ID constraint
-								Log.e(TAG, "Catching and ignoring SQL exception while inserting retrieved status update: " + e.getMessage());
-							}
-							
-						}
-						
-						// Close connection to the DB
-						db.close();
-						
-					}
-					else{
-						Log.d(TAG, "Skipping timeline insert for null data");
-					}
-					
-					Log.d(TAG, "Updater ran");
 					
 					/*
 					 * Sleep the thread until the next configured

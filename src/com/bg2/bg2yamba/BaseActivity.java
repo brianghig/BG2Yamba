@@ -3,6 +3,7 @@ package com.bg2.bg2yamba;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,6 +11,8 @@ import android.widget.Toast;
 
 public abstract class BaseActivity extends Activity {
 
+	protected static final String TAG = BaseActivity.class.getSimpleName();
+	
 	protected YambaApplication yamba;
 	
 	@Override
@@ -60,9 +63,15 @@ public abstract class BaseActivity extends Activity {
 	}
 	
 	@Override
-	public boolean onMenuOpened(int featureId, Menu menu) {
+	public boolean onPrepareOptionsMenu(Menu menu) {
 		
-		// get a handle on the Toggle Service menu item
+		// get a handle on the Toggle Service menu item\
+		if( menu == null ) {
+			Log.d(TAG, "Skipping on menu opened because no menu was provided");
+			return true;
+		}
+		
+		Log.d(TAG, "Updating menu item for Toggle Service based on current serviceRunning flag");
 		MenuItem toggleItem = menu.findItem(R.id.itemToggleService);
 		
 		if( yamba.isServiceRunning() ) {
