@@ -10,7 +10,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	
 	private static final String TAG = DBHelper.class.getSimpleName();
 	private static final String DB_NAME = "timeline.db";
-	private static final int DB_VERSION = 1;
+	private static final int DB_VERSION = 2;
 	public static final String TABLE_TIMELINE = "timeline";
 	public static final String C_ID = BaseColumns._ID;
 	public static final String C_CREATED_AT = "created_at";

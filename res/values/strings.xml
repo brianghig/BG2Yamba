@@ -31,4 +31,7 @@
     <string name="titleServiceStart">Start Update Service</string>
     <string name="titleServiceStop">Stop Update Service</string>
 
+    <!-- Timeline -->
+    <string name="titleTimeline">Timeline</string>
+    
 </resources>
