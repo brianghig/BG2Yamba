@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.ListView;
 
 public class TimelineActivity extends Activity {
@@ -14,24 +13,7 @@ public class TimelineActivity extends Activity {
 	protected DBHelper dbHelper;
 	protected SQLiteDatabase db;
 	protected Cursor cursor;
-	protected SimpleCursorAdapter adapter;
-	
-	/**
-	 * String array specifying which columsn in the cursor we're
-	 * binding from
-	 */
-	protected static final String[] FROM = {
-		DBHelper.C_CREATED_AT, DBHelper.C_USER, DBHelper.C_TEXT
-	};
-	
-	/**
-	 * Array of integers representing IDs of views in row.xml to
-	 * which we are binding data.  Indices of View IDs in this array
-	 * should correspond to strings in the FROM array of column names
-	 */
-	protected static final int[] TO = {
-		R.id.textCreatedAt, R.id.textUser, R.id.textText
-	};
+	protected TimelineAdapter adapter;
 	
 	/**
 	 * Initializes layout views, and opens a connection
@@ -71,7 +53,7 @@ public class TimelineActivity extends Activity {
 		startManagingCursor(cursor);
 		
 		// Set up the Adapter that will feed data into our List Timeline
-		this.adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
+		this.adapter = new TimelineAdapter(this, R.layout.row, cursor);
 		listTimeline.setAdapter(this.adapter);
 		
 	}
