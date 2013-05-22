@@ -18,11 +18,8 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static final String C_TEXT = "txt";
 	public static final String C_USER = "user";
 	
-	private Context context;
-	
 	public DBHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
-		this.context = context;
 	}
 	
 	@Override

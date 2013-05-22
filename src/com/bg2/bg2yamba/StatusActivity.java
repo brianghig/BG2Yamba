@@ -1,17 +1,12 @@
 package com.bg2.bg2yamba;
 
 import winterwell.jtwitter.TwitterException;
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -19,7 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class StatusActivity extends Activity implements OnClickListener, TextWatcher {
+public class StatusActivity extends BaseActivity implements OnClickListener, TextWatcher {
 	
 	private static final String TAG = StatusActivity.class.getSimpleName();
 	
@@ -56,34 +51,6 @@ public class StatusActivity extends Activity implements OnClickListener, TextWat
 		
 		Log.d(TAG, "StatusActivity finished onCreate");
 		
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = this.getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		
-		switch( item.getItemId() ) {
-			case R.id.itemPrefs:
-				startActivity(new Intent(this, PrefsActivity.class));
-				break;
-			case R.id.itemServiceStart:
-				startService(new Intent(this, UpdaterService.class));
-				break;
-			case R.id.itemServiceStop:
-				stopService(new Intent(this, UpdaterService.class));
-				break;
-			case R.id.itemTimelineView:
-				startActivity(new Intent(this, TimelineActivity.class));
-				break;
-		}
-		
-		return true;
 	}
 	
 	@Override

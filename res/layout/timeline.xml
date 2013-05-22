@@ -10,7 +10,7 @@
         android:layout_margin="10dp"
         android:gravity="center"
         android:text="@string/titleTimeline"
-        android:textColor="#fff"
+        android:textColor="#A000"
         android:textSize="30sp" />
 
     <ListView

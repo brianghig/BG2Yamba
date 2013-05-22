@@ -23,6 +23,8 @@ public class WelcomeActivity extends Activity implements OnClickListener, OnShar
 	protected EditText apiRoot;
 	protected Button startButton;
 	
+	private static final Class<? extends Activity> START_ACTIVITY = TimelineActivity.class;
+	
 	protected SharedPreferences sharedPreferences;
 	
 	/**
@@ -92,7 +94,7 @@ public class WelcomeActivity extends Activity implements OnClickListener, OnShar
 			finish(); //TODO Should this be done before or after starting the StatusActivity?
 			
 			//Intent over to StatusActivity
-			Intent intent = new Intent(this, StatusActivity.class);
+			Intent intent = new Intent(this, START_ACTIVITY);
 			startActivity(intent);
 		}
 		

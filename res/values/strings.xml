@@ -3,7 +3,7 @@
 
     <string name="app_name">BG2Yamba</string>
     <string name="menu_settings">Settings</string>
-    <string name="statusTitle">Update your status</string>
+    <string name="titleStatus">Update your status</string>
     <string name="statusHint">Enter your cool, new status!</string>
     <string name="statusUpdateButton">Post</string>
     <string name="statusUpdateFailed">Status update failed</string>
@@ -17,10 +17,17 @@
     <string name="summaryApiRoot">URL for the Twitter API</string>
     <string name="titleApiRoot">API Root</string>
     <string name="titlePrefs">Preferences</string>
-    <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="titlePurge">Purge Statuses</string>
+    <string name="title_activity_welcome">Welcome</string>
     <string name="action_settings">Settings</string>
     <string name="welcomeMessage">Welcome!  Please enter your account details to get started.</string>
     <string name="welcomeButton">Start!</string>
+    
+    <!-- Default Values for the ListView of a Status.  These should all be overwritten
+    when the status is retrieved from the DB, and are never expected to display to the user -->
+    <string name="defaultStatusCreatedAt">Sometime</string>
+    <string name="defaultStatusUser">Someone</string>
+    <string name="defaultStatusText">Something</string>
     
     <!-- Store some string keys here that are used by both Java and XML to reference Shared Preferences -->
     <string name="preferenceKeyUsername">username</string>
@@ -33,5 +40,7 @@
 
     <!-- Timeline -->
     <string name="titleTimeline">Timeline</string>
+    
+    <string name="comingSoon">Coming soon!</string>
     
 </resources>
