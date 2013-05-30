@@ -1,5 +1,9 @@
 package com.bg2.bg2yamba;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -18,6 +22,19 @@ public class TimelineActivity extends BaseActivity {
 	
 	protected Cursor cursor;
 	protected SimpleCursorAdapter adapter;
+	
+	/**
+	 * Broadcast receiver for Timeline updates
+	 * that refreshes the cursor and adapters
+	 * tied to the ListView
+	 */
+	private TimelineReceiver receiver;
+	
+	/**
+	 * IntentFilter for the TimelineReceiver to handle
+	 * Status Update notifications
+	 */
+	private IntentFilter filter;
 	
 	/**
 	 * Array of Strings representing the columns in the Cursor
@@ -48,6 +65,8 @@ public class TimelineActivity extends BaseActivity {
 		// Find the Timeline List View
 		this.listTimeline = (ListView) this.findViewById(R.id.listTimeline);
 		
+		receiver = new TimelineReceiver();
+		filter = new IntentFilter(UpdaterService.NEW_STATUS_INTENT);
 	}
 	
 	/**
@@ -75,6 +94,13 @@ public class TimelineActivity extends BaseActivity {
 		
 	}
 	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		// Remove the receiver
+		unregisterReceiver(receiver);
+	}
+	
 	/**
 	 * Retrieves a cursor for the currently cached Status Updates,
 	 * and binds the List Timeline with an associated Simple Cursor Adapter
@@ -89,6 +115,8 @@ public class TimelineActivity extends BaseActivity {
 		adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
 		adapter.setViewBinder(VIEW_BINDER);
 		listTimeline.setAdapter(adapter);
+		
+		registerReceiver(receiver, filter);
 	}
 	
 	/**
@@ -130,5 +158,23 @@ public class TimelineActivity extends BaseActivity {
 		}
 		
 	};
+	
+	class TimelineReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			/*
+			 * TODO This would be better to update a
+			 * LoaderManager, but until we figure that out...
+			 */
+			cursor = yamba.getStatusData().getStatusUpdates();
+			startManagingCursor(cursor);
+			
+			adapter.changeCursor(cursor);
+			adapter.notifyDataSetChanged();
+			Log.d(TAG, "TimelineReceiver activated.");
+		}
+		
+	}
 	
 }

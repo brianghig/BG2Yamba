@@ -15,6 +15,9 @@ import android.util.Log;
  */
 public class UpdaterService extends Service {
 
+	public static final String NEW_STATUS_INTENT = "com.bg2.bg2yamba.intent.NEW_STATUS";
+	public static final String NEW_STATUS_EXTRA_COUNT = "newStatusCount";
+	
 	private static final String TAG = UpdaterService.class.getSimpleName();
 	
 	/**
@@ -121,6 +124,9 @@ public class UpdaterService extends Service {
 					int newUpdates = yamba.fetchStatusUpdates();
 					if( newUpdates > 0 ) {
 						Log.d(TAG, "We have a new status");
+						Intent intent = new Intent(NEW_STATUS_INTENT);
+						intent.putExtra(NEW_STATUS_EXTRA_COUNT, newUpdates);
+						updaterService.sendBroadcast(intent);
 					}
 					
 					/*
